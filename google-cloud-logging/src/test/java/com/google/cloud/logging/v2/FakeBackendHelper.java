@@ -80,41 +80,41 @@ public class FakeBackendHelper {
 
       // create the stub
       GrpcLoggingServiceV2Stub stub = GrpcLoggingServiceV2Stub.create(settings.build());
+
+      System.out.printf("Start sending logs\n");
+
+      Logging logging = LoggingOptions.newBuilder().setTransportOptions(stub).build().getService();
+
+      // The name of the log to write to
+      String logName = "dummy-log";
+
+      // The data to write to the log
+      String text =
+          "Meaningless log payload. Following symbols complete payload to 1KB:"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
+              + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде";
+
+      LogEntry entry =
+          LogEntry.newBuilder(StringPayload.of(text))
+              .setSeverity(Severity.INFO)
+              .setLogName(logName)
+              .setResource(MonitoredResource.newBuilder("global").build())
+              .build();
+
+      // Writes the log entry asynchronously
+      for (int i = 0; i < 15; i++) {
+        logging.write(Collections.singleton(entry));
+      }
+      System.out.printf("Finished sending logs\n");
     } catch (IOException e) {
       // do nothing
     }
-
-    System.out.printf("Start sending logs\n");
-
-    Logging logging = LoggingOptions.getDefaultInstance().getService();
-
-    // The name of the log to write to
-    String logName = "dummy-log";
-
-    // The data to write to the log
-    String text =
-        "Meaningless log payload. Following symbols complete payload to 1KB:"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде"
-            + "0123456789abcdefghijklmnopqrstuwxyz!?+-%/=.,<>@#&^()_:;[]{}|$абвгде";
-
-    LogEntry entry =
-        LogEntry.newBuilder(StringPayload.of(text))
-            .setSeverity(Severity.INFO)
-            .setLogName(logName)
-            .setResource(MonitoredResource.newBuilder("global").build())
-            .build();
-
-    // Writes the log entry asynchronously
-    for (int i = 0; i < 15; i++) {
-      logging.write(Collections.singleton(entry));
-    }
-    System.out.printf("Finished sending logs\n");
   }
 }
