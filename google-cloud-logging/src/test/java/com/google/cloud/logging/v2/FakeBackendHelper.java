@@ -28,7 +28,6 @@ import com.google.cloud.logging.Logging;
 import com.google.cloud.logging.LoggingOptions;
 import com.google.cloud.logging.Payload.StringPayload;
 import com.google.cloud.logging.Severity;
-import com.google.cloud.logging.v2.stub.GrpcLoggingServiceV2Stub;
 import com.google.cloud.logging.v2.stub.LoggingServiceV2StubSettings;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
@@ -63,7 +62,8 @@ public class FakeBackendHelper {
                           })
                       .build());
 
-      // Configure the batching settings so that flow controller blocks after exactly 10 elements
+      // Configure the batching settings so that flow controller blocks after exactly
+      // 10 elements
       settings
           .writeLogEntriesSettings()
           .setBatchingSettings(
@@ -79,11 +79,12 @@ public class FakeBackendHelper {
                   .build());
 
       // create the stub
-      GrpcLoggingServiceV2Stub stub = GrpcLoggingServiceV2Stub.create(settings.build());
-
       System.out.printf("Start sending logs\n");
 
-      Logging logging = LoggingOptions.newBuilder().setTransportOptions(stub).build().getService();
+      GrpcTransportOptions transportOptions = builder.build();
+      LoggingOptions options =
+          LoggingOptions.newBuilder().setTransportOptions(transportOptions).build();
+      Logging logging = options.getService();
 
       // The name of the log to write to
       String logName = "dummy-log";
